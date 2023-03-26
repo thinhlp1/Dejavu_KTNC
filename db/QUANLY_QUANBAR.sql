@@ -1,0 +1,288 @@
+﻿CREATE DATABASE QuanLy_QuanBar
+
+USE QuanLy_QuanBar
+
+--Bảng 1
+CREATE TABLE NHANVIEN(
+	MANV varchar(255) NOT NULL, --PK
+	HOTENLOT nvarchar(255) NOT NULL,
+	TENNV nvarchar(255) NOT NULL,
+	CHUCVU nvarchar(255) NOT NULL
+)
+
+--Khóa chính
+ALTER TABLE dbo.NHANVIEN
+ADD CONSTRAINT PK_NHANVIEN
+PRIMARY KEY (MANV)
+
+--Bảng 2
+CREATE TABLE TAIKHOANNV(
+	TENTK varchar(255) NOT NULL, --UQ
+	MATKHAU varchar(255) NOT NULL, 
+	MANV varchar(255) NOT NULL --PK
+)
+
+--Khóa chính
+ALTER TABLE dbo.TAIKHOANNV
+ADD CONSTRAINT PK_TAIKHOANNV
+PRIMARY KEY (MANV)
+
+--Khóa unique
+ALTER TABLE dbo.TAIKHOANNV
+ADD CONSTRAINT UQ_TENTK_TAIKHOANNV
+UNIQUE (TENTK)
+
+--Khóa ngoại
+ALTER TABLE dbo.TAIKHOANNV
+ADD CONSTRAINT FK_TAIKHOANNV_NHANVIEN
+FOREIGN KEY (MANV) REFERENCES dbo.NHANVIEN(MANV)
+
+--Bảng 3
+CREATE TABLE DANHMUC(
+	MADM varchar(255) NOT NULL, --PK
+	TENDM nvarchar(255) NOT NULL, --UQ
+) 
+--Khóa chính
+ALTER TABLE dbo.DANHMUC
+ADD CONSTRAINT PK_DANHMUC
+PRIMARY KEY (MADM)
+
+--Khóa unique
+ALTER TABLE dbo.DANHMUC
+ADD CONSTRAINT UQ_TENDANHMUC_DANHMUC
+UNIQUE (TENDM)
+
+--Bảng 4
+CREATE TABLE SANPHAM(
+	MASP varchar(255) NOT NULL, --PK
+	TENSP nvarchar(255) NOT NULL, --UQ
+	DONGIA DECIMAL(38, 6) NOT NULL, 
+	GHICHU NVARCHAR(255), 
+	HINH varchar(MAX) NOT NULL,
+	MADM varchar(255) NOT NULL --FK
+)
+--Khóa chính
+ALTER TABLE dbo.SANPHAM
+ADD CONSTRAINT PK_SANPHAM
+PRIMARY KEY (MASP)
+
+--Khóa unique
+ALTER TABLE dbo.SANPHAM
+ADD CONSTRAINT UQ_TENSP_SANPHAM
+UNIQUE (TENSP)
+
+--Khóa ngoại
+ALTER TABLE dbo.SANPHAM
+ADD CONSTRAINT FK_SANPHAM_DANHMUC
+FOREIGN KEY (MADM) REFERENCES dbo.DANHMUC(MADM)
+
+--Bảng 5
+CREATE TABLE BAN(
+	MABAN varchar(255) NOT NULL, --PK
+	MANV varchar(255) NOT NULL, --FK
+	TrangThai bit NOT NULL
+)
+
+
+--Khóa chính
+ALTER TABLE dbo.BAN
+ADD CONSTRAINT PK_BAN
+PRIMARY KEY (MABAN)
+
+--Khóa ngoại
+ALTER TABLE dbo.BAN
+ADD CONSTRAINT FK_BAN_NHANVIEN
+FOREIGN KEY (MANV) REFERENCES dbo.NHANVIEN(MANV)
+
+
+
+--Khóa chính
+ALTER TABLE dbo.GIOHANG
+ADD CONSTRAINT PK_GIOHANG
+PRIMARY KEY (MAGH)
+
+--Khóa unique
+ALTER TABLE dbo.GIOHANG
+ADD CONSTRAINT UQ_TENSP_GIOHANG
+UNIQUE (TENSP)
+
+--Khóa ngoại-----------------------------------------
+ALTER TABLE dbo.GIOHANG
+ADD CONSTRAINT FK_GIOHANG_BAN
+FOREIGN KEY (MABAN) REFERENCES dbo.BAN(MABAN)
+
+ALTER TABLE dbo.GIOHANG
+ADD CONSTRAINT FK_GIOHANG_NHANVIEN
+FOREIGN KEY (MANV) REFERENCES dbo.NHANVIEN(MANV)
+
+ALTER TABLE dbo.GIOHANG
+ADD CONSTRAINT FK_GIOHANG_SANPHAM
+FOREIGN KEY (MASP) REFERENCES dbo.SANPHAM(MASP)
+------------------------------------------------------
+--Bảng 6
+Create TABLE HOADON(
+	MAHD varchar(255)  NOT NULL, --PK
+	NGAYLAPHOADON DATETIME  NOT NULL,
+	TRANGTHAI NVARCHAR(255)  NOT NULL,
+	MANV VARCHAR(255)  NOT NULL, --FK
+	TRANGTHAI_THONGKE BIT NOT NULL,
+	GHICHU NVARCHAR(MAX) NULL,
+	TONGTIEN DECIMAL(38, 6)  NOT NULL
+)
+
+
+--Khóa chính
+ALTER TABLE dbo.HOADON
+ADD CONSTRAINT PK_HOADON
+PRIMARY KEY (MAHD)
+
+--Khóa ngoại--------------------------------------
+ALTER TABLE dbo.HOADON
+ADD CONSTRAINT FK_HOADON_NHANVIEN
+FOREIGN KEY (MANV) REFERENCES dbo.NHANVIEN(MANV)
+
+
+--------------------------------------------------
+--Bảng 7
+Create TABLE HOADONCHITIET(
+	MAHDCT varchar(255)  NOT NULL, --PK
+	TENSP nvarchar(255)  NOT NULL, 
+	SOLUONG INT  NOT NULL,
+	DONGIA DECIMAL(38, 6)  NOT NULL,
+	
+	MAHD varchar(255)  NOT NULL, --FK
+	MASP varchar(255)  NOT NULL --FK
+)
+
+--Khóa chính
+ALTER TABLE dbo.HOADONCHITIET
+ADD CONSTRAINT PK_HOADONCHITIET
+PRIMARY KEY (MAHDCT)
+
+--Khóa ngoại--------------------------------------
+ALTER TABLE dbo.HOADONCHITIET
+ADD CONSTRAINT FK_HOADONCHITIET_HOADON
+FOREIGN KEY (MAHD) REFERENCES dbo.HOADON(MAHD)
+
+ALTER TABLE dbo.HOADONCHITIET
+ADD CONSTRAINT FK_HOADONCHITIET_SANPHAM
+FOREIGN KEY (MASP) REFERENCES dbo.SANPHAM(MASP)
+--------------------------------------------------
+
+-- bang 8
+create TABLE BAN_ODER (  
+    MaBan varchar (255) NOT NULL, --PK
+	GhiChu nvarchar (255) NULL,
+	MaBanGop varchar (255) NULL,
+	Voucher varchar (255) NULL ,
+)
+-- khoa chinh 
+ALTER TABLE dbo.BAN_ODER
+ADD CONSTRAINT PK_MaBan
+PRIMARY KEY (MaBan)
+--Khoa ngoai
+
+ALTER TABLE dbo.BAN_ODER 
+ADD CONSTRAINT FK_MaBan_BAN
+FOREIGN KEY (MaBan) REFERENCES dbo.BAN(MaBan)
+--
+-- bang 9
+create Table SanPham_GioHang (
+    ID int Identity(1,1) NOT NULL, --PK
+	MaBan varchar(255) NOT NULL, 
+	Hinh varchar(255) NOT NULL,
+	MaSp  varchar(255)  NOT NULL,
+	TenSp nvarchar (255) NOT NULL,
+	Gia DECIMAL(38, 6)  NOT NULL,
+	SoLuong NVARCHAR(255) NOT NULL,
+	)	
+-- khoa chinh 
+ALTER TABLE dbo.SanPham_GioHang
+ADD CONSTRAINT PK_ID
+PRIMARY KEY (ID)
+-- Khoa Ngoai
+alter TABLE dbo.SanPham_GioHang 
+ADD CONSTRAINT FK_MaBan_BAN_ODER
+FOREIGN KEY (MaBan) REFERENCES dbo.BAN_ODER(MaBan)
+
+ALTER TABLE dbo.SanPham_GioHang 
+ADD CONSTRAINT FK_BanGioHang_SanPham
+FOREIGN KEY (MaSp) REFERENCES dbo.SANPHAM(MASP)
+
+
+-- bảng 10
+Create TABLE MatKhauTam(
+         
+          PassTam NVARCHAR(25) NULL,
+		   TenTaiKhoan Varchar (255) NULL
+		   
+)
+insert into MatKhauTam(PassTam, TenTaiKhoan) 
+values (null, null)
+--INSERT DỮ LIỆU Bảng NHANVIEN
+INSERT INTO [dbo].[NHANVIEN]
+           ([MANV]
+           ,[HOTENLOT]
+           ,[TENNV]
+           ,[CHUCVU])
+     VALUES
+           ('NV01', N'Nguyễn Thị', N'An', N'Nhân viên'),
+		   ('NV02', N'Nguyễn Văn', N'Bình', N'Quản lý'),
+		   ('NV03', N'Châu Gia', N'Kiệt', N'Nhân viên')
+
+--INSERT DỮ LIỆU Bảng TAIKHOANNV
+INSERT INTO [dbo].[TAIKHOANNV]
+           ([TENTK]
+           ,[MATKHAU]
+           ,[MANV])
+     VALUES
+           ('annt', '12345', 'NV01'),
+		   ('binhnv', '12345', 'NV02'),
+		   ('kietcg', '12345', 'NV03')
+
+
+GO
+CREATE PROC sp_ThongKeTheoNgay(@NgayLapThongKe_TN VARCHAR(100))
+AS BEGIN
+	DECLARE @TrangThaiThongKe AS BIT
+	SET @TrangThaiThongKe = 1
+	Select CONVERT(VARCHAR(10), NGAYLAPHOADON, 120) AS 'Ngay', 
+	SUM(TONGTIEN) as N'Doanh thu'
+	FROM dbo.HOADON 
+	WHERE CONVERT(VARCHAR(10), NGAYLAPHOADON, 120) = @NgayLapThongKe_TN AND TRANGTHAI_THONGKE = @TrangThaiThongKe
+	GROUP BY CONVERT(VARCHAR(10), NGAYLAPHOADON, 120)
+END
+GO
+EXEC dbo.sp_ThongKeTHeoNgay @NgayLapThongKe_TN = '2022-12-01' -- varchar(100)
+
+
+/*Proc Thống kê theo tháng*/
+GO	
+CREATE PROC sp_ThongKeTheoThang(@NgayLapHoaDon_TT  VARCHAR(100))
+AS BEGIN
+	DECLARE @TrangThaiThongKe AS BIT
+	SET @TrangThaiThongKe = 1
+SELECT CAST(MONTH(NGAYLAPHOADON) AS VARCHAR(10)) +'-'+ CAST(YEAR(NGAYLAPHOADON) AS	VARCHAR(10)) AS 'Thang', 
+SUM(TONGTIEN) AS N'Doanh thu'
+FROM dbo.HOADON 
+WHERE CAST(MONTH(NGAYLAPHOADON) AS VARCHAR(10)) +'-'+ CAST(YEAR(NGAYLAPHOADON) AS	VARCHAR(10)) = @NgayLapHoaDon_TT AND TRANGTHAI_THONGKE = @TrangThaiThongKe
+GROUP BY CAST(MONTH(NGAYLAPHOADON) AS VARCHAR(10)) +'-'+ CAST(YEAR(NGAYLAPHOADON) AS VARCHAR(10))
+END
+GO
+EXEC dbo.sp_ThongKeTheoThang @NgayLapHoaDon_TT = '12-2022' -- varchar(100)
+ -- varchar(100)
+
+
+/*Proc thống kê theo năm*/
+GO	
+CREATE PROC sp_ThongKeTheoNam(@NgayLapHoaDon_TN VARCHAR(100))
+AS BEGIN
+	DECLARE @TrangThaiThongKe AS BIT
+	SET @TrangThaiThongKe = 1
+	Select YEAR(NGAYLAPHOADON) as 'Nam', SUM(TONGTIEN) as 'Doanh thu'
+	From dbo.HOADON 
+	WHERE YEAR(NGAYLAPHOADON) = @NgayLapHoaDon_TN AND TRANGTHAI_THONGKE = @TrangThaiThongKe
+	Group by YEAR(NGAYLAPHOADON)
+END
+EXEC dbo.sp_ThongKeTheoNam @NgayLapHoaDon_TN = '2022' -- varchar(100)
+

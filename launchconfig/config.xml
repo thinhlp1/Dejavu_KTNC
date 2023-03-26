@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>D:\FPT_Polytechnic\Hoc_Ki_4\taiLieuDuAn_1\DongGoiDuAn_1\DejavuManagerment\Dejavu.jar</jar>
+  <outfile>D:\FPT_Polytechnic\Hoc_Ki_4\taiLieuDuAn_1\DongGoiDuAn_1\DejavuManagerment\Dejavu.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl></downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon>D:\FPT_Polytechnic\Hoc_Ki_4\taiLieuDuAn_1\DongGoiDuAn_1\DejavuManagerment\DEjavu.ico</icon>
+  <singleInstance>
+    <mutexName>Dejavu</mutexName>
+    <windowTitle>Dejavu</windowTitle>
+  </singleInstance>
+  <jre>
+    <path>%JAVA_HOME%;%PATH%</path>
+    <requiresJdk>true</requiresJdk>
+    <requires64Bit>true</requires64Bit>
+    <minVersion>1.8</minVersion>
+    <maxVersion></maxVersion>
+  </jre>
+  <versionInfo>
+    <fileVersion>1.0.0.0</fileVersion>
+    <txtFileVersion>1.0.0.0</txtFileVersion>
+    <fileDescription>DejavuManagement</fileDescription>
+    <copyright>Dejavu</copyright>
+    <productVersion>1.0.0.0</productVersion>
+    <txtProductVersion>1.0.0.0</txtProductVersion>
+    <productName>DejavuOke</productName>
+    <companyName></companyName>
+    <internalName>DejavuManagement</internalName>
+    <originalFilename>Dejavu.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>ENGLISH_US</language>
+  </versionInfo>
+</launch4jConfig>
