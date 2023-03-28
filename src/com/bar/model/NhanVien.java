@@ -1,4 +1,3 @@
-
 package com.bar.model;
 
 /**
@@ -6,6 +5,7 @@ package com.bar.model;
  * @author PHUOCTAI
  */
 public class NhanVien {
+
     String maNV;
     String hoTenLot;
     String tenNV;
@@ -23,9 +23,8 @@ public class NhanVien {
 
     @Override
     public String toString() {
-        return hoTenLot + " "+ tenNV;
+        return hoTenLot + " " + tenNV;
     }
-    
 
     public String getMaNV() {
         return maNV;
@@ -58,6 +57,22 @@ public class NhanVien {
     public void setChucVu(String chucVu) {
         this.chucVu = chucVu;
     }
-    
-    
+
+//  CHECK NHANVIEN  
+    public String checkMaNV(String maNV) {
+        this.setMaNV(maNV);
+        return this.getMaNV();
+    }
+
+    public String checkTenNV(String ho, String ten) {
+        this.setHoTenLot(ho);
+        this.setTenNV(ten);
+        return this.getHoTenLot() + " " + this.getTenNV();
+    }
+
+    public boolean checkChucVu(String chucVu) {
+        this.setChucVu(chucVu);
+        return this.getChucVu().equals("Quản lý") || this.getChucVu().equals("Nhân viên") ? true : false;
+
+    }
 }

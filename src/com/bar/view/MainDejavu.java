@@ -50,7 +50,7 @@ public class MainDejavu extends javax.swing.JFrame {
 
     private JPanel callPanel;
 
-    private void showPanel(JPanel pnl) {
+    public void showPanel(JPanel pnl) {
         callPanel = pnl;
         panelRoot.removeAll();
         panelRoot.add(callPanel);

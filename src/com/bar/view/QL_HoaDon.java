@@ -4,6 +4,7 @@
  */
 package com.bar.view;
 
+import com.bar.customUI.TableWhite;
 import com.bar.dao.HoaDonChiTietDAO;
 import com.bar.dao.HoaDonDAO;
 import com.bar.dao.NhanVienDAO;
@@ -14,10 +15,7 @@ import com.bar.util.Auth;
 import com.bar.util.MsgBox;
 import com.raven.datechooser.SelectedDate;
 import java.awt.Color;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import javax.swing.JLabel;
@@ -29,28 +27,36 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import com.bar.util.JdbcHelper;
-import java.awt.Font;
+import com.raven.datechooser.DateChooser;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import javax.swing.table.JTableHeader;
+import javax.swing.JTextField;
 import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
  * @author nguye
  */
-public class QL_HoaDon extends javax.swing.JPanel {
+public class QL_HoaDon extends javax.swing.JPanel implements DocumentListener {
 
     HoaDonDAO hd = new HoaDonDAO();
     HoaDonChiTietDAO hdct = new HoaDonChiTietDAO();
     NhanVienDAO nv = new NhanVienDAO();
-    List<HoaDon> listHD = new ArrayList<>();
+    public List<HoaDon> listHD = new ArrayList<>();
     List<HoaDonChiTiet> listHDCT = new ArrayList<HoaDonChiTiet>();
     List<NhanVien> listNV = nv.select();
     List listTenNV = new ArrayList();
     int indexTable = -1;
 
-    DefaultTableModel tblModelHD;
+    public TableWhite getTblHoaDon() {
+        return tblHoaDon;
+    }
+
+    public void setTblHoaDon(TableWhite tblHoaDon) {
+        this.tblHoaDon = tblHoaDon;
+    }
+
+    public DefaultTableModel tblModelHD;
     DefaultTableModel tblModelHDCT;
 
     public QL_HoaDon() {
@@ -69,7 +75,9 @@ public class QL_HoaDon extends javax.swing.JPanel {
         fillCBO_TenNV();
         fillCBO_TrangThaiThongKe();
         txtBoLoc_Ngay.setText("");
-        documentChangedState_TextFieldDate();
+        documentChanged_Date(dateChooser_BoLoc_Ngay);
+        
+//        insertUpdate((DocumentEvent) txtBoLoc_Ngay);
         lblXuatHD.setEnabled(false);
     }
 
@@ -85,7 +93,7 @@ public class QL_HoaDon extends javax.swing.JPanel {
         tblModelHDCT.setColumnIdentifiers(columnHDCT);
     }
 
-    private void fillTableHD() {
+    public void fillTableHD() {
         tblModelHD = (DefaultTableModel) tblHoaDon.getModel();
         tblModelHD.setRowCount(0);
         for (HoaDon hoaDon : listHD) {
@@ -158,8 +166,24 @@ public class QL_HoaDon extends javax.swing.JPanel {
         return -1;
     }
 
-    void search_TenNV() {
+    public void setNgay(String date) {
+        txtBoLoc_Ngay.setText(date);
+    }
 
+    public String getNgay() {
+        return txtBoLoc_Ngay.getText();
+    }
+
+    public String searchTrangThaiThongKe() {
+        if (cboTrangThaiThongKe.getSelectedIndex() > 0) {
+            if (cboTrangThaiThongKe.getSelectedIndex() == 1) {
+                return "Bình thường";
+            }
+        }
+        return "Hủy";
+    }
+
+    void search_TenNV() {
         listHD = hd.select();
         try {
             if (cboTenNV.getSelectedIndex() > 0) {
@@ -173,6 +197,16 @@ public class QL_HoaDon extends javax.swing.JPanel {
         } catch (IndexOutOfBoundsException e) {
             MsgBox.alert(this, "Không có nhân viên!");
         }
+    }
+
+    public List<HoaDon> searchByState(Boolean state) {
+        List<HoaDon> receipts = new ArrayList<>();
+        for (HoaDon receipt : receipts) {
+            if (receipt.isTrangThai_ThongKe() == state) {
+                receipts.add(receipt);
+            }
+        }
+        return receipts;
     }
 
     void search_TrangThaiThongKe() {
@@ -190,11 +224,43 @@ public class QL_HoaDon extends javax.swing.JPanel {
         }
     }
 
-    void documentChangedState_TextFieldDate() {
+    public void search_Ngay() {
+//                listHD = hd.select();
+//                listHD.clear();
+        SelectedDate ngay = dateChooser_BoLoc_Ngay.getSelectedDate();
+        System.out.println(ngay);
+        String soThuTu = null;
+        if (ngay.getDay() < 10) {
+            soThuTu = "0";
+        } else {
+            soThuTu = "";
+        }
+
+        txtBoLoc_Ngay.setToolTipText(soThuTu + ngay.getDay() + "-" + ngay.getMonth() + "-" + ngay.getYear());
+        listHD = hd.selectBY_NgayLapHoaDon(ngay.getDay() + "", ngay.getMonth() + "", ngay.getYear() + "");
+        System.out.println(listHD.size());
+
+        if (listHD.size() > 0) {
+            fillTableHD();
+        } else {
+            listHD = hd.select();
+            fillTableHD();
+        }
+    }
+
+    @Override
+    public void insertUpdate(DocumentEvent e) {
+        e.getDocument().addDocumentListener(this);
+        search_Ngay();
+    }
+
+    public List<HoaDon> documentChanged_Date(DateChooser date) {
         txtBoLoc_Ngay.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                search_Ngay();
+                listHD.clear();
+                listHD = search_Ngay();
+                fillTableHD();
             }
 
             @Override
@@ -207,11 +273,11 @@ public class QL_HoaDon extends javax.swing.JPanel {
 //                search_Ngay();
             }
 
-            public void search_Ngay() {
-                List<HoaDon> listNgay = new ArrayList<HoaDon>();
-                listHD = hd.select();
-                //  listHD.clear();
-                SelectedDate ngay = dateChooser_BoLoc_Ngay.getSelectedDate();
+            public List<HoaDon> search_Ngay() {
+//                listHD = hd.select();
+//                listHD.clear();
+                List<HoaDon> list = new ArrayList<>();
+                SelectedDate ngay = date.getSelectedDate();
                 String soThuTu = null;
                 if (ngay.getDay() < 10) {
                     soThuTu = "0";
@@ -220,21 +286,23 @@ public class QL_HoaDon extends javax.swing.JPanel {
                 }
 
                 txtBoLoc_Ngay.setToolTipText(soThuTu + ngay.getDay() + "-" + ngay.getMonth() + "-" + ngay.getYear());
-                listHD = hd.selectBY_NgayLapHoaDon(ngay.getDay() + "", ngay.getMonth() + "", ngay.getYear() + "");
-                System.out.println(listHD.size());
+                list = hd.selectBY_NgayLapHoaDon(ngay.getDay() + "", ngay.getMonth() + "", ngay.getYear() + "");
+                System.out.println(list.size());
 
-                if (listHD.size() > 0) {
+                if (list.size() > 0) {
                     fillTableHD();
                 } else {
-                    listHD = hd.select();
+                    list = hd.select();
                     fillTableHD();
                 }
-
+               return list;
             }
         });
+        List<HoaDon> list = listHD;
+        return list;
     }
 
-    HoaDon getFormHoaDon() {
+    public HoaDon getFormHoaDon() {
         HoaDon hd = new HoaDon();
         int row = tblHoaDon.getSelectedRow();
         String maHD = (String) tblHoaDon.getValueAt(row, 0);
@@ -242,11 +310,19 @@ public class QL_HoaDon extends javax.swing.JPanel {
         return hd;
     }
 
-    void huyHoaDon() {
+    public void huyHoaDon() {
         HoaDon hoaDon = getFormHoaDon();
         hd.update(hoaDon);
         listHD = hd.select();
         fillTableHD();
+    }
+
+    public List<HoaDon> getListHD() {
+        return listHD;
+    }
+
+    public void setListHD(List<HoaDon> listHD) {
+        this.listHD = listHD;
     }
 
     void tinhTongTien() {
@@ -319,9 +395,6 @@ public class QL_HoaDon extends javax.swing.JPanel {
 
         dateChooser_NgayLapHD = new com.raven.datechooser.DateChooser();
         dateChooser_BoLoc_Ngay = new com.raven.datechooser.DateChooser();
-        pnlHoaDonChiTiet = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        tblHoaDonChiTiet = new com.bar.customUI.TableWhite();
         cboTenNV = new com.bar.customUI.ComboBoxSuggestion();
         jLabel4 = new javax.swing.JLabel();
         pnlHoaDon = new javax.swing.JPanel();
@@ -338,6 +411,9 @@ public class QL_HoaDon extends javax.swing.JPanel {
         lblLast = new javax.swing.JLabel();
         txtTongTien = new javax.swing.JLabel();
         lblXoa = new javax.swing.JLabel();
+        pnlHoaDonChiTiet = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tblHoaDonChiTiet = new com.bar.customUI.TableWhite();
 
         dateChooser_BoLoc_Ngay.setTextRefernce(txtBoLoc_Ngay);
         dateChooser_BoLoc_Ngay.addInputMethodListener(new java.awt.event.InputMethodListener() {
@@ -352,43 +428,6 @@ public class QL_HoaDon extends javax.swing.JPanel {
         setMinimumSize(new java.awt.Dimension(1835, 910));
         setPreferredSize(new java.awt.Dimension(1835, 910));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        pnlHoaDonChiTiet.setBackground(new java.awt.Color(255, 255, 255));
-        pnlHoaDonChiTiet.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Hóa đơn chi tiết", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 16))); // NOI18N
-
-        tblHoaDonChiTiet.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        tblHoaDonChiTiet.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
-        tblHoaDonChiTiet.setRowHeight(30);
-        jScrollPane2.setViewportView(tblHoaDonChiTiet);
-
-        javax.swing.GroupLayout pnlHoaDonChiTietLayout = new javax.swing.GroupLayout(pnlHoaDonChiTiet);
-        pnlHoaDonChiTiet.setLayout(pnlHoaDonChiTietLayout);
-        pnlHoaDonChiTietLayout.setHorizontalGroup(
-            pnlHoaDonChiTietLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlHoaDonChiTietLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 1656, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        pnlHoaDonChiTietLayout.setVerticalGroup(
-            pnlHoaDonChiTietLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlHoaDonChiTietLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-
-        add(pnlHoaDonChiTiet, new org.netbeans.lib.awtextra.AbsoluteConstraints(76, 560, 1690, 290));
 
         cboTenNV.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
         cboTenNV.addItemListener(new java.awt.event.ItemListener() {
@@ -436,30 +475,25 @@ public class QL_HoaDon extends javax.swing.JPanel {
             pnlHoaDonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlHoaDonLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1666, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 598, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlHoaDonLayout.setVerticalGroup(
             pnlHoaDonLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlHoaDonLayout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
-        add(pnlHoaDon, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 120, 1700, 300));
+        add(pnlHoaDon, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 120, 620, 300));
 
         jLabel15.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
         jLabel15.setText("Ngày");
         add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 20, -1, -1));
 
+        txtBoLoc_Ngay.setText("");
         txtBoLoc_Ngay.setToolTipText("");
         txtBoLoc_Ngay.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
-        txtBoLoc_Ngay.setLabelText("");
-        txtBoLoc_Ngay.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtBoLoc_NgayActionPerformed(evt);
-            }
-        });
         add(txtBoLoc_Ngay, new org.netbeans.lib.awtextra.AbsoluteConstraints(490, 50, 190, -1));
 
         jLabel16.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
@@ -492,7 +526,7 @@ public class QL_HoaDon extends javax.swing.JPanel {
                 lblXuatHDMouseExited(evt);
             }
         });
-        add(lblXuatHD, new org.netbeans.lib.awtextra.AbsoluteConstraints(1630, 460, 130, 70));
+        add(lblXuatHD, new org.netbeans.lib.awtextra.AbsoluteConstraints(720, 460, 130, 70));
 
         lblFirst.setBackground(new java.awt.Color(255, 255, 255));
         lblFirst.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
@@ -504,7 +538,7 @@ public class QL_HoaDon extends javax.swing.JPanel {
                 lblFirstMouseClicked(evt);
             }
         });
-        add(lblFirst, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 450, 110, 80));
+        add(lblFirst, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 450, 110, 80));
 
         lblBack.setBackground(new java.awt.Color(255, 255, 255));
         lblBack.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
@@ -516,7 +550,7 @@ public class QL_HoaDon extends javax.swing.JPanel {
                 lblBackMouseClicked(evt);
             }
         });
-        add(lblBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 450, 110, 80));
+        add(lblBack, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 450, 110, 80));
 
         lblNext.setBackground(new java.awt.Color(255, 255, 255));
         lblNext.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
@@ -528,7 +562,7 @@ public class QL_HoaDon extends javax.swing.JPanel {
                 lblNextMouseClicked(evt);
             }
         });
-        add(lblNext, new org.netbeans.lib.awtextra.AbsoluteConstraints(930, 450, 110, 80));
+        add(lblNext, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 450, 110, 80));
 
         lblLast.setBackground(new java.awt.Color(255, 255, 255));
         lblLast.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
@@ -540,7 +574,7 @@ public class QL_HoaDon extends javax.swing.JPanel {
                 lblLastMouseClicked(evt);
             }
         });
-        add(lblLast, new org.netbeans.lib.awtextra.AbsoluteConstraints(1070, 450, 110, 80));
+        add(lblLast, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 450, 110, 80));
 
         txtTongTien.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
         txtTongTien.setText("Tổng tiền :");
@@ -564,7 +598,44 @@ public class QL_HoaDon extends javax.swing.JPanel {
                 lblXoaMouseExited(evt);
             }
         });
-        add(lblXoa, new org.netbeans.lib.awtextra.AbsoluteConstraints(1460, 460, 150, 70));
+        add(lblXoa, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 460, 150, 70));
+
+        pnlHoaDonChiTiet.setBackground(new java.awt.Color(255, 255, 255));
+        pnlHoaDonChiTiet.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Hóa đơn chi tiết", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 16))); // NOI18N
+
+        tblHoaDonChiTiet.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        tblHoaDonChiTiet.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        tblHoaDonChiTiet.setRowHeight(30);
+        jScrollPane2.setViewportView(tblHoaDonChiTiet);
+
+        javax.swing.GroupLayout pnlHoaDonChiTietLayout = new javax.swing.GroupLayout(pnlHoaDonChiTiet);
+        pnlHoaDonChiTiet.setLayout(pnlHoaDonChiTietLayout);
+        pnlHoaDonChiTietLayout.setHorizontalGroup(
+            pnlHoaDonChiTietLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlHoaDonChiTietLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 588, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        pnlHoaDonChiTietLayout.setVerticalGroup(
+            pnlHoaDonChiTietLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlHoaDonChiTietLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        add(pnlHoaDonChiTiet, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 120, -1, -1));
     }// </editor-fold>//GEN-END:initComponents
 
     private void lblXuatHDMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblXuatHDMouseExited
@@ -590,12 +661,8 @@ public class QL_HoaDon extends javax.swing.JPanel {
     private void dateChooser_BoLoc_NgayCaretPositionChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_dateChooser_BoLoc_NgayCaretPositionChanged
     }//GEN-LAST:event_dateChooser_BoLoc_NgayCaretPositionChanged
 
-    private void txtBoLoc_NgayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBoLoc_NgayActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtBoLoc_NgayActionPerformed
-
     private void lblXuatHDMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblXuatHDMouseClicked
-       int row = tblHoaDon.getSelectedRow();
+        int row = tblHoaDon.getSelectedRow();
         String maHD = (String) tblHoaDon.getValueAt(row, 0);
         xuatHoaDon(maHD);
     }//GEN-LAST:event_lblXuatHDMouseClicked
@@ -688,4 +755,15 @@ public class QL_HoaDon extends javax.swing.JPanel {
     private com.bar.customUI.TextField txtBoLoc_Ngay;
     private javax.swing.JLabel txtTongTien;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void removeUpdate(DocumentEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void changedUpdate(DocumentEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
 }
