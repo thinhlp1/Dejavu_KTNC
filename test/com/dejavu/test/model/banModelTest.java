@@ -1,4 +1,4 @@
-package com.dejavu.test;
+package com.dejavu.test.model;
 
 import com.bar.model.Ban;
 import org.junit.Test;
