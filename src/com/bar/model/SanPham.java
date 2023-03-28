@@ -21,12 +21,13 @@ public class SanPham {
     public SanPham() {
     }
 
-    public SanPham(String maMon, String tenMon, long gia, String danhMuc, String ghiChu) {
+    public SanPham(String maMon, String tenMon, long gia, String danhMuc, String ghiChu,String image) {
         this.maMon = maMon;
         this.tenMon = tenMon;
         this.gia = gia;
         this.danhMuc = danhMuc;
         this.ghiChu = ghiChu;
+        this.hinh = image;
     }
 
     public SanPham(String tenMon, String hinh, long gia) {

@@ -141,7 +141,7 @@ public class PNL_SanPham extends javax.swing.JPanel {
         return tenDM;
     }
 
-    void updateStatus() {
+     public void updateStatus() {
         boolean edit = (this.row_SanPham >= 0);
         boolean first = (this.row_SanPham == 0);
         boolean last = (this.row_SanPham == tblSanPham.getRowCount() - 1);
@@ -156,7 +156,7 @@ public class PNL_SanPham extends javax.swing.JPanel {
 
     }
 
-    void setFormSanPham(com.bar.model.SanPham sp) {
+   public void setFormSanPham(com.bar.model.SanPham sp) {
         // String gia = sp.getGia().toString().length()+"";
         // int doDaiGia = Integer.parseInt(gia) - 2;
         txtMaMon.setText(sp.getMaMon());
@@ -192,7 +192,7 @@ public class PNL_SanPham extends javax.swing.JPanel {
     }
     //Update Status comingsoon...
 
-    void clearFormSanPham() {
+    public void clearFormSanPham() {
 
         txtMaMon.setText("");
         txtTenMon.setText("");
@@ -210,8 +210,9 @@ public class PNL_SanPham extends javax.swing.JPanel {
         //update status
         this.updateStatus();
     }
-
-    void insertSanPham() {
+    
+    
+    public void insertSanPham() {
         com.bar.model.SanPham sp = getFormSanPham();
         if (sp.getHinh() == null) {
             MsgBox.alert(this, "Hình Không Được Để Trống");
@@ -227,8 +228,29 @@ public class PNL_SanPham extends javax.swing.JPanel {
             e.printStackTrace();
         }
     }
+    
+    //inser for test
+     public String insertSanPham(SanPham sp) {
+       
+        if (sp.getHinh() == null) {
+            //MsgBox.alert(this, "Hình Không Được Để Trống");
+            return  "Hình Không Được Để Trống";
+        }
+        try {
+            spdao.insert(sp);
+            this.fillTableSanPham();
+            this.clearFormSanPham();
+//            MsgBox.alert(this, "Thêm mới San Pham thanh cong!");
+            return "Thêm mới San Pham thanh cong!";
+        } catch (Exception e) {
+//            MsgBox.alert(this, "Thêm moi San Pham that bai!");
+          
+            e.printStackTrace();
+               return "Thêm moi San Pham that bai!";
+        }
+    }
 
-    void updateSanPham() {
+    public void updateSanPham() {
         com.bar.model.SanPham sp = getFormSanPham();
         try {
             spdao.update(sp);
@@ -240,7 +262,7 @@ public class PNL_SanPham extends javax.swing.JPanel {
         }
     }
 
-    void deleteSanPham() {
+    public void deleteSanPham() {
         String maDM = txtMaMon.getText();
         if (MsgBox.confirm(this, "Bạn thực sự muốn xóa san pham này?")) {
             try {
@@ -255,7 +277,7 @@ public class PNL_SanPham extends javax.swing.JPanel {
         }
     }
 
-    void timSanPham() {
+    public void timSanPham() {
         DefaultTableModel model = (DefaultTableModel) tblSanPham.getModel();
         model.setRowCount(0);
         try {
@@ -283,7 +305,7 @@ public class PNL_SanPham extends javax.swing.JPanel {
 
     }
 
-    void locSanPham() {
+    public void locSanPham() {
         //if (cbDanhMuc_Loc.getSelectedItem())
         DefaultTableModel model = (DefaultTableModel) tblSanPham.getModel();
         model.setRowCount(0);
@@ -314,7 +336,7 @@ public class PNL_SanPham extends javax.swing.JPanel {
 
     }
 
-    void editSanPham() {
+    public void editSanPham() {
         String maSP = (String) tblSanPham.getValueAt(this.row_SanPham, 0);
         com.bar.model.SanPham sp = spdao.selectID(maSP);
         this.setFormSanPham(sp);
@@ -322,20 +344,20 @@ public class PNL_SanPham extends javax.swing.JPanel {
         //tbpNguoiHoc.setSelectedIndex(1); 
     }
 
-    void timDanhMuc() {
+    public void timDanhMuc() {
         this.fillTableSanPham();
         this.clearFormSanPham();
         this.row_SanPham = -1;
         this.updateStatus();
     }
 
-    void firstDanhMuc() {
+    public void firstDanhMuc() {
         row_SanPham = 0;
         tblSanPham.setRowSelectionInterval(row_SanPham, row_SanPham);
         this.editSanPham();
     }
 
-    void preDanhMuc() {
+   public void preDanhMuc() {
         if (row_SanPham > 0) {
             row_SanPham--;
             tblSanPham.setRowSelectionInterval(row_SanPham, row_SanPham);
@@ -343,7 +365,7 @@ public class PNL_SanPham extends javax.swing.JPanel {
         }
     }
 
-    void nextDanhMuc() {
+    public void nextDanhMuc() {
         if (row_SanPham < tblSanPham.getRowCount() - 1) {
             row_SanPham++;
             tblSanPham.setRowSelectionInterval(row_SanPham, row_SanPham);
@@ -351,7 +373,7 @@ public class PNL_SanPham extends javax.swing.JPanel {
         }
     }
 
-    void lastDanhMuc() {
+    public void lastDanhMuc() {
         row_SanPham = tblSanPham.getRowCount() - 1;
         tblSanPham.setRowSelectionInterval(row_SanPham, row_SanPham);
         this.editSanPham();
@@ -359,7 +381,7 @@ public class PNL_SanPham extends javax.swing.JPanel {
 
     DanhMucDAO dmdao = new DanhMucDAO();
 
-    void fillComboBoxDanhMuc() {
+    public void fillComboBoxDanhMuc() {
         DefaultComboBoxModel model = (DefaultComboBoxModel) cbDanhMuc.getModel();
         model.removeAllElements();
         try {
@@ -372,7 +394,7 @@ public class PNL_SanPham extends javax.swing.JPanel {
         }
     }
 
-    void fillComboBoxDanhMucLoc() {
+    public void fillComboBoxDanhMucLoc() {
         DefaultComboBoxModel model = (DefaultComboBoxModel) cbDanhMuc_Loc.getModel();
         //model.removeAllElements();
         try {
@@ -412,7 +434,7 @@ public class PNL_SanPham extends javax.swing.JPanel {
         return image;
     }
 
-    void chonAnh() {
+    public void chonAnh() {
 
         if (filenChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File file = filenChooser.getSelectedFile();
@@ -427,7 +449,7 @@ public class PNL_SanPham extends javax.swing.JPanel {
         }
     }
 
-    void docAnh(SanPham sp) {
+    public void docAnh(SanPham sp) {
         ImageIcon iconTam1 = XImage.read(sp.getHinh());
         Image img1 = iconTam1.getImage();
         ImageIcon icon1 = new ImageIcon(img1.getScaledInstance(lblAnh.getWidth(), lblAnh.getHeight(), Image.SCALE_SMOOTH));
