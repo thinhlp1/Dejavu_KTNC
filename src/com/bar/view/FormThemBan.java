@@ -1,4 +1,3 @@
-
 package com.bar.view;
 
 import com.bar.dao.BanDAO;
@@ -170,26 +169,27 @@ public class FormThemBan extends javax.swing.JFrame {
 
     }
 
+    public String insertTable(Ban ban) {
+        boolean check = checkMaBan();
+        if (check == true) {
+            return "Them ban khong thanh cong";
+        }
+            banDao.insert(ban);
+            listBan.clear();
+            listBan = banDao.select();
+          //  MsgBox.alert(this, "Thêm bàn thành công!");
+System.out.println("Them thanh cong");
+            return "Thêm bàn thành công!";
+        }
+
+    
 
     private void lbl_MaBanMoiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lbl_MaBanMoiActionPerformed
 
     }//GEN-LAST:event_lbl_MaBanMoiActionPerformed
 
     private void lbl_ThemBanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl_ThemBanMouseClicked
-        boolean check = checkMaBan();
-        if (check == false) {
 
-            Ban ban = new Ban();
-
-            String maNv = String.valueOf(cb_MaNhanVien.getSelectedItem());
-            ban.setMaNhanVien(maNv);
-            ban.setMaBan(lbl_MaBanMoi.getText());
-            banDao.insert(ban);
-            listBan.clear();
-            listBan = banDao.select();
-            MsgBox.alert(this, "Thêm bàn thành công!");
-            return;
-        }
     }//GEN-LAST:event_lbl_ThemBanMouseClicked
 
     private void lbl_MaBanMoiKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_lbl_MaBanMoiKeyPressed
