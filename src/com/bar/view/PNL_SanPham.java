@@ -115,6 +115,28 @@ public class PNL_SanPham extends javax.swing.JPanel {
         }
     }
 
+    public int fillTableSanPham(List<com.bar.model.SanPham> list) {
+        DefaultTableModel model = (DefaultTableModel) tblSanPham.getModel();
+        tblSanPham.setDefaultEditor(Object.class, null);
+        model.setRowCount(0);
+
+        for (com.bar.model.SanPham sp : list) {
+            //String gia = sp.getGia().toString().length()+"";
+            //int doDaiGia = Integer.parseInt(gia) - 2;
+            Object[] row = {
+                sp.getMaMon(),
+                sp.getTenMon(),
+                toMoneyString(sp.getGia()),
+                getTenDM(sp.getDanhMuc()),
+                //sp.getDanhMuc(),
+                sp.getGhiChu(),
+                sp.getHinh()
+            };
+            model.addRow(row);
+        }
+        return model.getRowCount();
+    }
+
     public static String toMoneyString(long moneyy) {
         String money = moneyy + "";
         int x = 0; // cứ 3 số đơn vị sẽ là một dấu chấm
@@ -141,7 +163,7 @@ public class PNL_SanPham extends javax.swing.JPanel {
         return tenDM;
     }
 
-     public void updateStatus() {
+    public void updateStatus() {
         boolean edit = (this.row_SanPham >= 0);
         boolean first = (this.row_SanPham == 0);
         boolean last = (this.row_SanPham == tblSanPham.getRowCount() - 1);
@@ -156,7 +178,7 @@ public class PNL_SanPham extends javax.swing.JPanel {
 
     }
 
-   public void setFormSanPham(com.bar.model.SanPham sp) {
+    public void setFormSanPham(com.bar.model.SanPham sp) {
         // String gia = sp.getGia().toString().length()+"";
         // int doDaiGia = Integer.parseInt(gia) - 2;
         txtMaMon.setText(sp.getMaMon());
@@ -167,13 +189,13 @@ public class PNL_SanPham extends javax.swing.JPanel {
         // lblAnh.setIcon(ResizeImage(String.valueOf(duongDanAnh)));
         lblAnh.setToolTipText(sp.getHinh());
         if (sp.getHinh() != null) {
-            lblAnh.setIcon(ResizeImage(String.valueOf(XImage.read(sp.getHinh()))));
+//            lblAnh.setIcon(ResizeImage(String.valueOf(XImage.read(sp.getHinh()))));
         }
         areaGhiChu1.setText(sp.getGhiChu());
 
     }
 
-    com.bar.model.SanPham getFormSanPham() {
+    public com.bar.model.SanPham getFormSanPham() {
         DefaultComboBoxModel model = (DefaultComboBoxModel) cbDanhMuc.getModel();
         com.bar.model.SanPham sp = new com.bar.model.SanPham();
         sp.setMaMon(txtMaMon.getText());
@@ -210,8 +232,7 @@ public class PNL_SanPham extends javax.swing.JPanel {
         //update status
         this.updateStatus();
     }
-    
-    
+
     public void insertSanPham() {
         com.bar.model.SanPham sp = getFormSanPham();
         if (sp.getHinh() == null) {
@@ -228,25 +249,32 @@ public class PNL_SanPham extends javax.swing.JPanel {
             e.printStackTrace();
         }
     }
-    
+
     //inser for test
-     public String insertSanPham(SanPham sp) {
-       
+    public String insertSanPham(SanPham sp) {
+
         if (sp.getHinh() == null) {
-            //MsgBox.alert(this, "Hình Không Được Để Trống");
-            return  "Hình Không Được Để Trống";
+            return "Hình Không Được Để Trống";
         }
         try {
             spdao.insert(sp);
             this.fillTableSanPham();
             this.clearFormSanPham();
-//            MsgBox.alert(this, "Thêm mới San Pham thanh cong!");
             return "Thêm mới San Pham thanh cong!";
         } catch (Exception e) {
-//            MsgBox.alert(this, "Thêm moi San Pham that bai!");
-          
             e.printStackTrace();
-               return "Thêm moi San Pham that bai!";
+            return "Thêm moi San Pham that bai!";
+        }
+    }
+
+    public String updateSanPham(SanPham sp) {
+
+        try {
+            spdao.update(sp);
+            this.fillTableSanPham();
+            return "Cap Nhat San Pham thanh cong!";
+        } catch (Exception e) {
+            return "Cap Nhat San Pham that bai!";
         }
     }
 
@@ -260,6 +288,22 @@ public class PNL_SanPham extends javax.swing.JPanel {
             MsgBox.alert(this, "Cap Nhat San Pham that bai!");
             e.printStackTrace();
         }
+    }
+
+    public String deleteSanPham(String maMon) {
+
+        if (MsgBox.confirm(this, "Bạn thực sự muốn xóa san pham này?")) {
+            try {
+                spdao.delete(maMon);
+                this.fillTableSanPham();
+                this.clearFormSanPham();
+                return "Xóa thành công!";
+            } catch (Exception e) {
+                return "Xóa thất bại!";
+
+            }
+        }
+        return "Xóa thất bại!";
     }
 
     public void deleteSanPham() {
@@ -304,6 +348,39 @@ public class PNL_SanPham extends javax.swing.JPanel {
         }
 
     }
+    
+    public String timSanPham(String keyWord) {
+        DefaultTableModel model = (DefaultTableModel) tblSanPham.getModel();
+        model.setRowCount(0);
+        try {
+            String keyword = txtTimKiem.getText();
+            if (keyWord != null) {
+                List<SanPham> list = spdao.selectByKeyword2(keyWord);
+                for (SanPham sp : list) {
+                    Object[] row = {
+                        sp.getMaMon(),
+                        sp.getTenMon(),
+                        sp.getGia(),
+                        sp.getDanhMuc(),
+                        sp.getGhiChu()
+                    };
+                    model.addRow(row);
+                }
+                txtTimKiem.setText("");
+                this.updateStatus();
+                return model.getRowCount() + "";
+            } else {
+//                MsgBox.alert(this, "Không tìm thấy sản phẩm");
+                return "Không tìm thấy sản phẩm";
+            }
+        } catch (Exception e) {
+//            MsgBox.alert(this, "Lỗi truy vấn dữ liệu!");
+            return  "Lỗi truy vấn dữ liệu!";
+        }
+
+    }
+    
+    
 
     public void locSanPham() {
         //if (cbDanhMuc_Loc.getSelectedItem())
@@ -357,7 +434,7 @@ public class PNL_SanPham extends javax.swing.JPanel {
         this.editSanPham();
     }
 
-   public void preDanhMuc() {
+    public void preDanhMuc() {
         if (row_SanPham > 0) {
             row_SanPham--;
             tblSanPham.setRowSelectionInterval(row_SanPham, row_SanPham);
@@ -456,14 +533,39 @@ public class PNL_SanPham extends javax.swing.JPanel {
         lblAnh.setIcon(icon1);
         lblAnh.setToolTipText(sp.getHinh());
     }
+
     boolean isUpdate = false;
 
-    boolean checkDupKey(String maMon) {
+    public boolean checkDupKey(String maMon) {
         SanPham sp = spdao.selectID(maMon);
         if (sp != null) {
             return true;
         }
         return false;
+    }
+
+    public String checkForm(String maMon, String tenMon, String gia) {
+        String mauGia = "[0-9]{1,20}";
+        String mauMaMon = "[A-Za-z0-9]{1,20}";
+        if (maMon.equals("") || tenMon.equals("") || gia.equals("")) {
+//            MsgBox.alert(this, "Hãy nhập đủ dữ liệu sau đó ấn Thêm");
+            return "Hãy nhập đủ dữ liệu sau đó ấn Thêm";
+        }
+
+        if (!txtMaMon.getText().matches(mauMaMon)) {
+//            MsgBox.alert(this, );
+            return "Mã món không chứ kí tự đặt biệt!";
+
+        }
+        long giaMoi = 0;
+        giaMoi = toMoneyLong(txtGia1.getText());
+        String giaNew = String.valueOf(giaMoi);
+        if (!giaNew.matches(mauGia)) {
+//            MsgBox.alert(this, );
+            return "Giá vui lòng nhập số và lớn hơn 0";
+        }
+
+        return "Hợp lệ";
     }
 
     boolean checkForm() {
