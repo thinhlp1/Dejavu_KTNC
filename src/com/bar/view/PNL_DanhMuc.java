@@ -7,6 +7,7 @@ package com.bar.view;
 
 import com.bar.dao.DanhMucDAO;
 import com.bar.model.DanhMuc;
+import com.bar.model.SanPham;
 import com.bar.util.MsgBox;
 import java.awt.Color;
 import java.awt.Font;
@@ -30,20 +31,23 @@ public class PNL_DanhMuc extends javax.swing.JPanel {
         initComponents();
         initLoadData();
         fillTableDanhMuc();
-       // initTable(tblDanhMuc);
+        // initTable(tblDanhMuc);
     }
 
     DanhMucDAO dmdao = new DanhMucDAO();
     int row_DanhMuc = -1;
-    public void initLoadData(){
+
+    public void initLoadData() {
         setModelTable_DanhMuc();
         btnXoa.setEnabled(false);
         btnCapNhat.setEnabled(false);
     }
-    public void setModelTable_DanhMuc(){
-         DefaultTableModel modelDanhMuc = new DefaultTableModel(new Object[][]{}, new Object[]{"Ma Danh Muc","Ten Danh Muc"});
-         tblDanhMuc.setModel(modelDanhMuc);
+
+    public void setModelTable_DanhMuc() {
+        DefaultTableModel modelDanhMuc = new DefaultTableModel(new Object[][]{}, new Object[]{"Ma Danh Muc", "Ten Danh Muc"});
+        tblDanhMuc.setModel(modelDanhMuc);
     }
+
     void updateStatus() {
         boolean edit = (this.row_DanhMuc >= 0);
         boolean first = (this.row_DanhMuc == 0);
@@ -58,19 +62,20 @@ public class PNL_DanhMuc extends javax.swing.JPanel {
         btnLast.setEnabled(edit && !last);
 
     }
-    void fillTableDanhMuc(){
+
+    void fillTableDanhMuc() {
         DefaultTableModel model = (DefaultTableModel) tblDanhMuc.getModel();
         tblDanhMuc.setDefaultEditor(Object.class, null);
         model.setRowCount(0);
-         try {
+        try {
             String keyword = txtTimKiem2.getText();
             if (keyword != null) {
 
-                List<com.bar.model.DanhMuc> list = dmdao.selectByKeyword(keyword);    
+                List<com.bar.model.DanhMuc> list = dmdao.selectByKeyword(keyword);
                 for (com.bar.model.DanhMuc dm : list) {
                     Object[] row = {
                         dm.getMaDanhMuc(),
-                        dm.getTenDanhMuc()};                        
+                        dm.getTenDanhMuc()};
                     model.addRow(row);
                 }
             }
@@ -80,29 +85,47 @@ public class PNL_DanhMuc extends javax.swing.JPanel {
             e.printStackTrace();
         }
     }
-    
-    void setFormDanhMuc(com.bar.model.DanhMuc dm){
+
+    public int fillTableDanhMuc(List<com.bar.model.DanhMuc> list) {
+        DefaultTableModel model = (DefaultTableModel) tblDanhMuc.getModel();
+        tblDanhMuc.setDefaultEditor(Object.class, null);
+        model.setRowCount(0);
+
+        for (com.bar.model.DanhMuc dm : list) {
+            Object[] row = {
+                dm.getMaDanhMuc(),
+                dm.getTenDanhMuc()};
+            model.addRow(row);
+        }
+
+        return model.getRowCount();
+
+    }
+
+    public void setFormDanhMuc(com.bar.model.DanhMuc dm) {
         txtMaDanhMuc.setText(dm.getMaDanhMuc());
         txtTenDanhMuc.setText(dm.getTenDanhMuc());
     }
-    com.bar.model.DanhMuc getFormDanhMuc(){
+
+    public com.bar.model.DanhMuc getFormDanhMuc() {
         com.bar.model.DanhMuc dm = new com.bar.model.DanhMuc();
         dm.setMaDanhMuc(txtMaDanhMuc.getText());
         dm.setTenDanhMuc(txtTenDanhMuc.getText());
         return dm;
     }
     //Update Status comingsoon...
-    
-    void clearFormDanhMuc(){
+
+    void clearFormDanhMuc() {
         txtMaDanhMuc.setText("");
         txtTenDanhMuc.setText("");
-        
+
         this.row_DanhMuc = -1;
-      
+
         //update status
         this.updateStatus();
     }
-    void insertDanhMuc(){
+
+    void insertDanhMuc() {
         com.bar.model.DanhMuc dm = getFormDanhMuc();
         try {
             dmdao.insert(dm);
@@ -110,86 +133,173 @@ public class PNL_DanhMuc extends javax.swing.JPanel {
             this.clearFormDanhMuc();
             MsgBox.alert(this, "Thêm mới danh muc thanh cong!");
         } catch (Exception e) {
-             MsgBox.alert(this, "Thêm moi danh muc that bai!");
-             e.printStackTrace();
+            MsgBox.alert(this, "Thêm moi danh muc that bai!");
+            e.printStackTrace();
         }
     }
-    void updateDanhMuc(){
-         com.bar.model.DanhMuc dm = getFormDanhMuc();
+
+    public String insertDanhMuc(DanhMuc dm) {
+        try {
+            dmdao.insert(dm);
+            this.fillTableDanhMuc();
+            this.clearFormDanhMuc();
+            return "Thêm mới danh muc thanh cong!";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Thêm moi danh muc that bai!";
+        }
+    }
+
+    void updateDanhMuc() {
+        com.bar.model.DanhMuc dm = getFormDanhMuc();
         try {
             dmdao.update(dm);
             this.fillTableDanhMuc();
             MsgBox.alert(this, "Cap Nhat danh muc thanh cong!");
         } catch (Exception e) {
-             MsgBox.alert(this, "Cap Nhat danh muc that bai!");
-             e.printStackTrace();
+            MsgBox.alert(this, "Cap Nhat danh muc that bai!");
+            e.printStackTrace();
         }
     }
-    void deleteDanhMuc(){
-       String maDM = txtMaDanhMuc.getText();
-            if (MsgBox.confirm(this, "Bạn thực sự muốn xóa danh muc này?")) {
-                try {
-                    dmdao.delete(maDM);
-                    this.fillTableDanhMuc();
-                    this.clearFormDanhMuc();
-                    MsgBox.alert(this, "Xóa thành công!");
-                } catch (Exception e) {
-                    MsgBox.alert(this, "Xóa thất bại!");
-                    e.printStackTrace();
-                }  
+
+    public String updateDanhMuc(DanhMuc dm) {
+
+        try {
+            dmdao.update(dm);
+            this.fillTableDanhMuc();
+//            MsgBox.alert(this, "Cap Nhat danh muc thanh cong!");
+            return "Cap Nhat danh muc thanh cong!";
+        } catch (Exception e) {
+//             MsgBox.alert(this, "Cap Nhat danh muc that bai!");
+            return "Cap Nhat danh muc that bai!";
+        }
     }
+
+    void deleteDanhMuc() {
+        String maDM = txtMaDanhMuc.getText();
+        if (MsgBox.confirm(this, "Bạn thực sự muốn xóa danh muc này?")) {
+            try {
+                dmdao.delete(maDM);
+                this.fillTableDanhMuc();
+                this.clearFormDanhMuc();
+                MsgBox.alert(this, "Xóa thành công!");
+            } catch (Exception e) {
+                MsgBox.alert(this, "Xóa thất bại!");
+                e.printStackTrace();
+            }
+        }
     }
-        void timDanhMuc(){
+
+    public String deleteDanhMuc(String maDM) {
+
+        if (MsgBox.confirm(this, "Bạn thực sự muốn xóa danh muc này?")) {
+            try {
+                dmdao.delete(maDM);
+                this.fillTableDanhMuc();
+                this.clearFormDanhMuc();
+//                MsgBox.alert(this, "Xóa thành công!");
+                return "Xóa thành công!";
+            } catch (Exception e) {
+//                MsgBox.alert(this, "Xóa thất bại!");
+                return "Xóa thất bại!";
+            }
+        }
+        return "Xóa thành công!";
+    }
+
+    void timDanhMuc() {
         DefaultTableModel model = (DefaultTableModel) tblDanhMuc.getModel();
         model.setRowCount(0);
         try {
             String keyword = txtTimKiem2.getText();
-            if(keyword != null){
-            List<DanhMuc> list = dmdao.selectByKeyword(keyword);
-            for(DanhMuc dm : list){
-                Object[] row = {
-                    dm.getMaDanhMuc(),
-                    dm.getTenDanhMuc()
-                };
-                model.addRow(row);
-            }
-            txtTimKiem2.setText("");
-            this.updateStatus();
-            }else{
-                 MsgBox.alert(this, "Không tìm thấy Danh Mục");
+            if (keyword != null) {
+                List<DanhMuc> list = dmdao.selectByKeyword(keyword);
+                for (DanhMuc dm : list) {
+                    Object[] row = {
+                        dm.getMaDanhMuc(),
+                        dm.getTenDanhMuc()
+                    };
+                    model.addRow(row);
+                }
+                txtTimKiem2.setText("");
+                this.updateStatus();
+            } else {
+                MsgBox.alert(this, "Không tìm thấy Danh Mục");
             }
         } catch (Exception e) {
             MsgBox.alert(this, "Lỗi truy vấn dữ liệu!");
         }
-        
     }
-    void editDanhMuc(){
+
+    public String timDanhMuc(String keyword) {
+        DefaultTableModel model = (DefaultTableModel) tblDanhMuc.getModel();
+        model.setRowCount(0);
+        try {
+
+            if (keyword != null) {
+                List<DanhMuc> list = dmdao.selectByKeyword(keyword);
+                for (DanhMuc dm : list) {
+                    Object[] row = {
+                        dm.getMaDanhMuc(),
+                        dm.getTenDanhMuc()
+                    };
+                    model.addRow(row);
+                }
+                txtTimKiem2.setText("");
+                this.updateStatus();
+                return model.getRowCount() + "";
+            } else {
+//                MsgBox.alert(this, "Không tìm thấy Danh Mục");
+                return "Không tìm thấy Danh Mục";
+            }
+        } catch (Exception e) {
+//            MsgBox.alert(this, "Lỗi truy vấn dữ liệu!");
+            return "Lỗi truy vấn dữ liệu!";
+        }
+    }
+
+    void editDanhMuc() {
         String maDM = (String) tblDanhMuc.getValueAt(this.row_DanhMuc, 0);
         com.bar.model.DanhMuc dm = dmdao.selectID(maDM);
         this.setFormDanhMuc(dm);
         this.updateStatus();
         //tbpNguoiHoc.setSelectedIndex(1); 
     }
-    boolean checkForm(){
-        String mauMaDM ="[A-Za-z0-9]{1,20}";
-         if(txtMaDanhMuc.getText().equals("") || txtTenDanhMuc.getText().equals("")){
-              MsgBox.alert(this, "Hãy nhập đủ dữ liệu sau đó ấn Thêm");
-              return false; 
-         }else if(!txtMaDanhMuc.getText().matches(mauMaDM)){
-             MsgBox.alert(this, "Mã dan mục không chứ kí tự đặt biệt!");
-             return false;   
-         }
-         return true;
-     }
+
+    boolean checkForm() {
+        String mauMaDM = "[A-Za-z0-9]{1,20}";
+        if (txtMaDanhMuc.getText().equals("") || txtTenDanhMuc.getText().equals("")) {
+            MsgBox.alert(this, "Hãy nhập đủ dữ liệu sau đó ấn Thêm");
+            return false;
+        } else if (!txtMaDanhMuc.getText().matches(mauMaDM)) {
+            MsgBox.alert(this, "Mã dan mục không chứ kí tự đặt biệt!");
+            return false;
+        }
+        return true;
+    }
+
+    public String checkForm(String maDM, String tenDM) {
+        String mauMaDM = "[A-Za-z0-9]{1,20}";
+        if (maDM.equals("") || tenDM.equals("")) {
+//              MsgBox.alert(this, "Hãy nhập đủ dữ liệu sau đó ấn Thêm");
+            return "Hãy nhập đủ dữ liệu sau đó ấn Thêm";
+        } else if (!txtMaDanhMuc.getText().matches(mauMaDM)) {
+//             MsgBox.alert(this, "Mã dan mục không chứ kí tự đặt biệt!");
+            return "Mã danh mục không chứ kí tự đặt biệt!";
+        }
+        return "Hãy nhập đủ dữ liệu sau đó ấn Thêm";
+    }
+
     boolean isUpdate = false;
-    boolean checkDupKey(String maDM) {
+
+    public boolean checkDupKey(String maDM) {
         DanhMuc sp = dmdao.selectID(maDM);
         if (sp != null) {
             return true;
         }
         return false;
-        }
-    
+    }
+
     void firstDanhMuc() {
         row_DanhMuc = 0;
         tblDanhMuc.setRowSelectionInterval(row_DanhMuc, row_DanhMuc);
@@ -217,7 +327,7 @@ public class PNL_DanhMuc extends javax.swing.JPanel {
         tblDanhMuc.setRowSelectionInterval(row_DanhMuc, row_DanhMuc);
         this.editDanhMuc();
     }
-    
+
     private void initTable(JTable table) {
         table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 18));
         table.getTableHeader().setForeground(new Color(26, 72, 86));
@@ -234,6 +344,7 @@ public class PNL_DanhMuc extends javax.swing.JPanel {
         table.setForeground(new Color(71, 102, 102));
         table.setFont(new Font("Segoe UI", Font.BOLD, 16));
     }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -440,7 +551,7 @@ public class PNL_DanhMuc extends javax.swing.JPanel {
 
     private void btnThemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnThemActionPerformed
         isUpdate = false;
-         if (checkDupKey(txtMaDanhMuc.getText()) == false) {
+        if (checkDupKey(txtMaDanhMuc.getText()) == false) {
             if (checkForm()) {
                 insertDanhMuc();
             }
@@ -451,7 +562,7 @@ public class PNL_DanhMuc extends javax.swing.JPanel {
     }//GEN-LAST:event_btnThemActionPerformed
 
     private void btnFirstActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFirstActionPerformed
-       firstDanhMuc();
+        firstDanhMuc();
     }//GEN-LAST:event_btnFirstActionPerformed
 
     private void btnPreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreActionPerformed
@@ -459,38 +570,38 @@ public class PNL_DanhMuc extends javax.swing.JPanel {
     }//GEN-LAST:event_btnPreActionPerformed
 
     private void btnCapNhatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCapNhatActionPerformed
-      isUpdate = true;
-        if(checkForm()){
-          updateDanhMuc();  
+        isUpdate = true;
+        if (checkForm()) {
+            updateDanhMuc();
         }
     }//GEN-LAST:event_btnCapNhatActionPerformed
 
     private void btnXoaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnXoaActionPerformed
-       deleteDanhMuc();
+        deleteDanhMuc();
     }//GEN-LAST:event_btnXoaActionPerformed
 
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextActionPerformed
-       nextDanhMuc();
+        nextDanhMuc();
     }//GEN-LAST:event_btnNextActionPerformed
 
     private void btnLastActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLastActionPerformed
-       lastDanhMuc();
+        lastDanhMuc();
     }//GEN-LAST:event_btnLastActionPerformed
 
     private void btnLamMoiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLamMoiActionPerformed
-       clearFormDanhMuc();
-       this.fillTableDanhMuc();
+        clearFormDanhMuc();
+        this.fillTableDanhMuc();
     }//GEN-LAST:event_btnLamMoiActionPerformed
 
     private void btnTimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTimActionPerformed
-       timDanhMuc();
-       this.clearFormDanhMuc();
-       this.row_DanhMuc = -1;
+        timDanhMuc();
+        this.clearFormDanhMuc();
+        this.row_DanhMuc = -1;
 
     }//GEN-LAST:event_btnTimActionPerformed
 
     private void tblDanhMucMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblDanhMucMouseClicked
-               if (evt.getClickCount() == 2) {
+        if (evt.getClickCount() == 2) {
             this.row_DanhMuc = tblDanhMuc.getSelectedRow();
             this.editDanhMuc();
         }
