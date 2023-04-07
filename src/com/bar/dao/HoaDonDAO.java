@@ -66,6 +66,7 @@ public class HoaDonDAO extends DejavuDAO<HoaDon, String> {
         }
         return list.get(0);
     }
+    
 
     public List<HoaDon> selectBY_IDNV(String id) {
         return this.selectBySql(SELECT_BY_IDNV_SQL, id);

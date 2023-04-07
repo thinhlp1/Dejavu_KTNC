@@ -11,6 +11,7 @@ public class HoaDonChiTietDAO extends DejavuDAO<HoaDonChiTiet, String> {
 
     String SELECT_ALL_SQL = "SELECT * FROM HOADONCHITIET";
     String SELECT_BY_MAHD_SQL = "SELECT * FROM HOADONCHITIET WHERE MAHD = ?";
+    String SELECT_BY_MAHDCT_SQL = "SELECT * FROM HOADONCHITIET WHERE MAHDCT = ?";
     String INSERT = "INSERT INTO HOADONCHITIET VALUES (?,?,?,?,?,?)";
 
     @Override
@@ -48,10 +49,7 @@ public class HoaDonChiTietDAO extends DejavuDAO<HoaDonChiTiet, String> {
         return this.selectBySql(SELECT_BY_MAHD_SQL, maHD);
     }
 
-    @Override
-    public HoaDonChiTiet selectID(String id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    
 
     @Override
     protected List<HoaDonChiTiet> selectBySql(String sql, Object... args) {
@@ -74,6 +72,11 @@ public class HoaDonChiTietDAO extends DejavuDAO<HoaDonChiTiet, String> {
             throw new RuntimeException(e);
         }
 
+    }
+
+    @Override
+    public HoaDonChiTiet selectID(String id) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
 }
