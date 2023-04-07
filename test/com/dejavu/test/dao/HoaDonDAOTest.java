@@ -21,14 +21,11 @@ import org.junit.Before;
 public class HoaDonDAOTest {
 
     HoaDonDAO dao;
-    JdbcHelper helper;
-    HoaDon hd;
+
 
     @Before
     public void setUp() {
         dao = new HoaDonDAO();
-        helper = new JdbcHelper();
-        hd = new HoaDon();
     }
 
     @Test
