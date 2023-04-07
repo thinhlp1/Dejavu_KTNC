@@ -49,7 +49,7 @@ public class HoaDonDAOTest {
         assertEquals(hd.getNgayLapHD(), hdEx.getNgayLapHD());
         assertEquals(hd.getTrangThaiThanhToan(), hdEx.getTrangThaiThanhToan());
         assertEquals(hd.getMaNV(), hdEx.getMaNV());
-        assertEquals(true, hdEx.isTrangThai_ThongKe());
+        assertEquals(false, hdEx.isTrangThai_ThongKe());
         assertEquals(hd.getGhiChu(), hdEx.getGhiChu());
         assertEquals(hd.getTongTien(), hdEx.getTongTien(), 0.01);
     }
@@ -89,12 +89,12 @@ public class HoaDonDAOTest {
         // Create a new HoaDon object and insert it into the database
         HoaDon hd = new HoaDon();
         hd.setMaHD("HD003");
-        hd.setNgayLapHD("2023-04-07");
-        hd.setTrangThaiThanhToan("Đã thanh toán");
-        hd.setMaNV("NV01");
+        hd.setNgayLapHD("2023-04-08");
+        hd.setTrangThaiThanhToan("Chưa thanh toán");
+        hd.setMaNV("NV02");
         hd.setTrangThai_ThongKe(false);
         hd.setGhiChu("Test select HoaDon");
-        hd.setTongTien(100000);
+        hd.setTongTien(200000);
         dao.insert(hd);
 
         // Call the select method to retrieve all objects from the database

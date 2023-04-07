@@ -19,17 +19,10 @@ import org.junit.Before;
 public class HoaDonChiTietDAOTest {
 
     HoaDonChiTietDAO daoHDCT;
-    HoaDonChiTiet hdct;
-    JdbcHelper helper;
-    String SELECT_ALL_SQL = "SELECT * FROM HOADONCHITIET";
-    String SELECT_BY_MAHD_SQL = "SELECT * FROM HOADONCHITIET WHERE MAHD = ?";
-    String INSERT = "INSERT INTO HOADONCHITIET VALUES (?,?,?,?,?,?)";
 
     @Before
     public void setUp() {
         daoHDCT = new HoaDonChiTietDAO();
-        helper = new JdbcHelper();
-        hdct = new HoaDonChiTiet();
     }
 
     @Test
@@ -121,5 +114,4 @@ public class HoaDonChiTietDAOTest {
 
     }
 
-    
 }

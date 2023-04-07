@@ -18,18 +18,6 @@ import static org.junit.Assert.*;
 public class JdbcHelperTest {
 
     @Test
-    public void testGetDburl() {
-    }
-
-    @Test
-    public void testGetUsername() {
-    }
-
-    @Test
-    public void testGetPassword() {
-    }
-
-    @Test
     public void testGetStmt() throws SQLException {
         String sql = "SELECT * FROM HoaDon WHERE MaHD = ?";
         String expectedMaHD = "HD001";
