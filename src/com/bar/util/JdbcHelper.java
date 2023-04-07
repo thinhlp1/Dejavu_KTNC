@@ -11,7 +11,7 @@ public class JdbcHelper {
     private static String driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     private static String dburl = "jdbc:sqlserver://localhost:1433;database=QuanLy_QuanBar;encrypt=true;trustServerCertificate=true";
     private static String username = "sa";
-    private static String password = "12345";
+    private static String password = "123";
     /*
 * Nạp driver
      */
@@ -87,7 +87,7 @@ public class JdbcHelper {
         try {
             ResultSet rs = JdbcHelper.query(sql, args);
             if (rs.next()) {
-                return rs.getObject(0);
+                return rs.getObject(1);
             }
             rs.getStatement().getConnection().close();
             return null;
@@ -95,4 +95,5 @@ public class JdbcHelper {
             throw new RuntimeException(e);
         }
     }
+
 }
