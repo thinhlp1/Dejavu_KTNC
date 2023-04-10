@@ -114,12 +114,9 @@ public class DanhMucDAOTest {
       @Test(expected = RuntimeException.class)
     public void testUpdate_TC02() {
         danhMucDAO.insert(dm1);
-        danhMucDAO.insert(dm2);
-     
-        
+        danhMucDAO.insert(dm2); 
         dm2.setMaDanhMuc(dm1.getMaDanhMuc());
-        danhMucDAO.update(dm2);
-        
+        danhMucDAO.update(dm2);      
         DanhMuc result = danhMucDAO.selectID(dm2.getMaDanhMuc());
         assertEquals(result.getMaDanhMuc(), dm2.getMaDanhMuc());
         assertNotNull(result);
@@ -129,8 +126,7 @@ public class DanhMucDAOTest {
     public void testUpdate_TC03() {
         danhMucDAO.insert(dm1);
         danhMucDAO.insert(dm2);
-     
-        
+  
         dm2.setTenDanhMuc(dm1.getTenDanhMuc());
         danhMucDAO.update(dm2);
         
