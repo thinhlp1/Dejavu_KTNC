@@ -29,6 +29,7 @@ public class BanDAO extends DejavuDAO<Ban, String> {
                     model.getMaNhanVien());
 
         } catch (SQLException e) {
+            System.out.println(e);
         }
     }
 
