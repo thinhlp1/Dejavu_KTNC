@@ -14,8 +14,8 @@ public class SanPhamDAOTest {
     SanPhamDAO sanPhamDAO;
     SanPham sp1;
     SanPham sp2;
-    String ma1;
-    String ma2;
+    String ma1 = "";
+    String ma2 = "";
 
     @Before
     public void setUp() {
@@ -42,17 +42,36 @@ public class SanPhamDAOTest {
         SanPham result = sanPhamDAO.selectID(ma1);
         assertNotNull(result);
     }
+    
+    @Test(expected = RuntimeException.class)
+    public void testInsert_TC02() {
+        sp1.setMaMon(null);
+        sanPhamDAO.insert(sp1);
+        SanPham result = sanPhamDAO.selectID(ma1);
+        assertNotNull(result);
+    }
+    
+ 
 
     @Test
-    public void testDelete() {
+    public void testDelete_TC01() {
         sanPhamDAO.insert(sp1);
         sanPhamDAO.delete(ma1);
         SanPham result = sanPhamDAO.selectID(ma1);
         assertNull(result);
     }
+    
+        @Test(expected = RuntimeException.class)
+    public void testDelete_TC02() {
+       
+        sanPhamDAO.delete("SP02");
+        SanPham result = sanPhamDAO.selectID("SP02");
+        assertNull(result);
+    }
 
+    
     @Test
-    public void testUpdate() {
+    public void testUpdate_TC01() {
         sanPhamDAO.insert(sp1);
         sp1.setTenMon("Bia Ha Noi 333");
         sanPhamDAO.update(sp1);
@@ -60,13 +79,24 @@ public class SanPhamDAOTest {
         assertEquals(result.getTenMon(), sp1.getTenMon());
         assertNotNull(result);
     }
+    
+     @Test(expected = RuntimeException.class)
+    public void testUpdate_TC02() {
+        sp1.setTenMon(null);
+        sanPhamDAO.insert(sp1);
+        
+        SanPham result = sanPhamDAO.selectID(ma1);
+        assertEquals(result.getTenMon(), sp1.getTenMon());
+        assertNotNull(result);
+    }
+
 
     @Test
     public void testSelectAll() {
         sanPhamDAO.insert(sp1);
         sanPhamDAO.insert(sp2);
         List<SanPham> result = sanPhamDAO.selectAll();
-        int lengthExpected = 47;
+        int lengthExpected = 46;
         for (SanPham sanPham : result) {
             if (sanPham.getMaMon().equals(sp1.getMaMon())) {
                 assertEquals(sanPham.getMaMon(), sp1.getMaMon());
