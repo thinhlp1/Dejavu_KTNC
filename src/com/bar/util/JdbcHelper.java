@@ -87,7 +87,7 @@ public class JdbcHelper {
         try {
             ResultSet rs = JdbcHelper.query(sql, args);
             if (rs.next()) {
-                return rs.getObject(0);
+                return rs.getObject(1);
             }
             rs.getStatement().getConnection().close();
             return null;
@@ -95,4 +95,5 @@ public class JdbcHelper {
             throw new RuntimeException(e);
         }
     }
+
 }
